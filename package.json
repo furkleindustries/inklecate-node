@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/furkleindustries/inklecate.git"
+    "url": "git+https://github.com/furkleindustries/inklecate-node.git"
   },
   "keywords": [
     "ink",
@@ -20,9 +20,9 @@
   "author": "furkle",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/furkleindustries/inklecate/issues"
+    "url": "https://github.com/furkleindustries/inklecate-node/issues"
   },
-  "homepage": "https://github.com/furkleindustries/inklecate#readme",
+  "homepage": "https://github.com/furkleindustries/inklecate-node#readme",
   "dependencies": {
     "colorful-logging": "^1.2.2",
     "commander": "^2.20.0",
