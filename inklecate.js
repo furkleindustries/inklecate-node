@@ -1,78 +1,125 @@
+const baseDEBUG = require('./DEBUG');
+
 const ArgsEnum = require('./ArgsEnum');
-const {
-  error,
-  log,
-} = require('colorful-logging');
 const {
   spawn,
 } = require('child_process');
-const getInklecatePath = require('./getInklecatePath');
-const readline = require('readline');
 const {
-  assert,
+  log,
+} = require('colorful-logging');
+const quit = require('./quit');
+const finish = require('./finish');
+const getCacheFilepath = require('./getCacheFilepath');
+const getInklecatePath = require('./getInklecatePath');
+const {
+  relative,
+} = require('path');
+const {
+  assertValid,
 } = require('ts-assertions');
 
 module.exports = function inklecate(args) {
-  assert(
+  const safeArgs = Array.prototype.slice.call(assertValid(
     args,
-    'The args argument was not an array with a filepath and at least one ' +
-      'option.',
+    'The args argument was not an array with a filepath.',
     function (args) {
-      return Array.isArray(args) && args.length >= 2;
+      return Array.isArray(args) && args.length;
     },
+  ));
+
+  const DEBUG = safeArgs.indexOf('DEBUG') > -1 || baseDEBUG;
+
+  const isPlaying = safeArgs.indexOf(ArgsEnum.Play) !== -1;
+  const re = new RegExp(`^${ArgsEnum.OutputFile} (.+)$`);
+  const outputArg = safeArgs.find(re.test.bind(re));
+  const isOutputting = !isPlaying || hasOutputArg;
+  const hasOutputArg = Boolean(outputArg);
+  const isCaching = isOutputting && !hasOutputArg;
+
+  const outputFilepathRaw =
+    outputArg && typeof outputArg.match === 'function' ?
+      outputArg.match(re)[1] :
+      getCacheFilepath();
+
+  const outputFilepath = relative(process.cwd(), outputFilepathRaw);
+
+  const inputFilepathRaw = safeArgs.splice(safeArgs.length - 1, 1)[0];
+  const inputFilepath = relative(process.cwd(), inputFilepathRaw);
+  const outputArgIndex = safeArgs.indexOf(outputArg);
+  safeArgs.splice(outputArgIndex, 1);
+
+  safeArgs.splice(
+    safeArgs.length,
+    0,
+    '-o',
+    outputFilepath,
   );
 
-  const isPlaying = args.indexOf(ArgsEnum.Play) !== -1
-  if (!isPlaying) {
-    assert(
-      args.filter(function filter(arg) {
-        return new RegExp(`^${ArgsEnum.OutputFile}`).test(arg);
-      }).length,
-      'The -p play option was not received, but no -o output file option ' +
-        'was given.',
-    );
-  }
+  safeArgs.splice(
+    safeArgs.length,
+    0,
+    inputFilepath,
+  );
 
-  return new Promise(function (resolve, reject) {
-    const proc = spawn(getInklecatePath(), args);
+  return new Promise(function cb(resolve, reject) {
+    const proc = spawn(getInklecatePath(), safeArgs);
 
-    proc.on('exit', function ex() {
-      if (isPlaying) {
-        console.log('THE END');
+    const rejector = quit.bind(null, reject);
+
+    proc.stdout.on('readable', function cb() {
+      const readout = proc.stdout.read();
+      if (readout) {
+        DEBUG && log('inklecate has emitted a message:');
+        log(String(readout));
       }
-
-      return resolve();
-    });
-
-    proc.stdout.on('data', function data(chunk) {
-      const chunkStr = String(chunk);
-      if (isPlaying) {
-        if (/\?>\s+$/.test(chunkStr)) {
-          const prompt = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: false,
-          });
-
-          prompt.question(chunkStr, function cb(result) {
-            prompt.close();
-            proc.stdin.write(`${result}\n`);
-          });
-        } else {
-          log(chunkStr);
-          return resolve();
-        }
-      }
-    });
-
-    proc.stderr.on('data', function data(chunk) {
-      error(chunk);
-      return reject(chunk);
     });
 
     proc.on('error', function cb(err) {
-      error(err);
-      return reject(err);
+      DEBUG && error('The inklecate-node package has encountered an error.');
+      rejector(err);
+    });
+
+    DEBUG && proc.on('message', function cb(msg) {
+      log(`inklecate has a message: ${msg}`);
+    });
+
+    proc.stderr.on('data', function cb(err) {
+      DEBUG && error('The inklecate-node package has encountered a stderr issue.');
+      rejector(err);
+    });
+
+    const chunks = [];
+    proc.stdout.on('data', function cb(chunk) {
+      const chunkStr = String(chunk);
+      if (isPlaying) {
+        playLine(chunkStr, stdin);
+      } else {
+        chunks.push(chunkStr);
+      }
+    });
+
+    DEBUG && proc.stdout.on('end', function cb() {
+      log('inklecate has closed its stdout channel.');
+    });
+
+    proc.on('exit', function cb(code, signal) {
+      DEBUG && log('inklecate is done.');
+
+      if (code > 0) {
+        return rejector(
+          `inklecate exited with code ${code}` +
+            `${signal ? ` and signal ${signal}` : ''}.`,
+        );
+      }
+
+      finish(Object.assign({
+        inputFilepath,
+        isCaching,
+        isPlaying,
+        outputFilepath,
+        reject,
+        resolve,
+      }, isPlaying ? {} : { compilerOutput: chunks }));
     });
   });
 };

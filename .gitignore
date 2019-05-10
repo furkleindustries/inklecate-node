@@ -1,4 +1,6 @@
 build/
+cache/*
+!cache/.gitkeep
 dist/
 node_modules/
 
