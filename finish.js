@@ -35,7 +35,9 @@ module.exports = function finish(args) {
 
         unlink(outputFilepath, function cb(err) {
           if (err) {
-            return doQuit(err);
+            if (err.code !== 'ENOENT') {
+              return doQuit(err);
+            }
           }
 
           return resolve({
