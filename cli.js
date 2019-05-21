@@ -48,12 +48,16 @@ const opts = Object.freeze({
 inklecate(opts).then(
   function resolved(data) {
     DEBUG && log('inklecate-node has completed.');
-    if (!data || !data.length) {
+    if (!data ||
+        (Array.isArray(data) && !data.length) ||
+        !Object.keys(data).length)
+    {
       error('No result from inklecate-node.');
       return;
     }
 
-    data.forEach(function forEach(datum) {
+    const list = Array.isArray(data) ? data : [ data ];
+    list.forEach(function forEach(datum) {
       if (datum &&
           (datum.storyContent || (Array.isArray(datum) && datum.length)))
       {

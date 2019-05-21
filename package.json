@@ -1,6 +1,6 @@
 {
   "name": "inklecate",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A tiny wrapper around the desktop executables for ink's command-line Ink language compiler.",
   "main": "index.js",
   "bin": {
