@@ -17,7 +17,9 @@ module.exports = function execute(args) {
 
   const inputFilepath = args.inputFilepath;
   const isCaching = args.isCaching;
-  const outputFilepath = isCaching ? getCacheFilepath() : args.outputFilepath;
+  const outputFilepath = isCaching ?
+    getCacheFilepath(args.inputFilepath) :
+    args.outputFilepath;
 
   const isPlaying = args.isPlaying;
   const keepRunning = args.keepRunning;
