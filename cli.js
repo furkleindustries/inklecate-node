@@ -23,29 +23,43 @@ program
   .option('-v', 'Verbose mode - print compilation timings')
   .option('-k', 'Keep inklecate running in play mode even after story is ' +
                 'complete')
+  .option('--glob', 'Allow glob compilation of multiple files.')
   .option('--DEBUG', 'Enable debug mode for inklecate-node.')
   .parse(process.argv);
 
 const DEBUG = baseDEBUG || program.DEBUG;
 
-const filename = assertValid(
-  program.args[0],
-  'The file name argument was not found.',
+const inputFilepaths = assertValid(
+  program.args.filter((arg) => arg[0] !== '-'),
+  'No input filepaths were found.',
+  (result) => result.length,
 );
 
-const opts = Object.freeze([].concat(
-  program.k ? [ ArgsEnum.KeepRunning ] : [],
-  program.p || program.play ? [ ArgsEnum.Play ] : [],
-  program.v ? [ ArgsEnum.Verbose ] : [],
-  program.o || program.outputFile ?
-    [ `${ArgsEnum.OutputFile} ${program.o || program.outputFile}` ] :
-    [],
-).concat([ filename ]));
+const opts = Object.freeze({
+  inputFilepaths,
+  glob: program.glob,
+  keepRunning: program.k,
+  isPlaying: program.p || program.play,
+  outputFilepath: program.o || program.outputFile || null,
+  verbose: program.v,
+  DEBUG: program.DEBUG,
+});
 
 require('./inklecate')(opts).then(
   function resolved(data) {
     DEBUG && log('inklecate-node has completed.');
-    log(JSON.stringify(data.storyContent.root));
+    if (!data || !data.length) {
+      error('No result from inklecate-node.');
+      return;
+    }
+
+    data.forEach(function forEach(datum) {
+      if (datum &&
+          (datum.storyContent || (Array.isArray(datum) && datum.length)))
+      {
+        log(JSON.stringify(datum));
+      }
+    });
   },
   function rejected(err) {
     error(err);

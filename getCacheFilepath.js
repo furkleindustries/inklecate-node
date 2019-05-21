@@ -1,12 +1,11 @@
 const {
   join,
 } = require('path');
-const uuid = require('uuid/v4');
+const uuid5 = require('uuid/v5');
 
 const cacheDir = join(__dirname, 'cache');
-const cacheId = uuid();
-const cacheFileName = join(cacheDir, `${cacheId}.json`);
 
-module.exports = function getCacheFilePath() {
-  return cacheFileName;
-}
+module.exports = function getCacheFilePath(absolutePath) {
+  const cacheId = uuid5(absolutePath, uuid5.URL);
+  return join(cacheDir, `${cacheId}.json`);
+};

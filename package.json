@@ -1,9 +1,11 @@
 {
   "name": "inklecate",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "A tiny wrapper around the desktop executables for ink's command-line Ink language compiler.",
   "main": "index.js",
-  "bin": { "inklecate": "./cli.js" },
+  "bin": {
+    "inklecate": "./cli.js"
+  },
   "scripts": {
     "test": "jest"
   },
@@ -27,6 +29,7 @@
   "dependencies": {
     "colorful-logging": "^1.2.2",
     "commander": "^2.20.0",
+    "glob": "^7.1.4",
     "ts-assertions": "^2.0.5",
     "uuid": "^3.3.2"
   },

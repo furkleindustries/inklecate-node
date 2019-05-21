@@ -1,125 +1,51 @@
-const baseDEBUG = require('./DEBUG');
-
-const ArgsEnum = require('./ArgsEnum');
-const {
-  spawn,
-} = require('child_process');
-const {
-  log,
-} = require('colorful-logging');
-const quit = require('./quit');
-const finish = require('./finish');
-const getCacheFilepath = require('./getCacheFilepath');
-const getInklecatePath = require('./getInklecatePath');
+const execute = require('./execute');
+const glob = require('glob');
 const {
   relative,
 } = require('path');
-const {
-  assertValid,
-} = require('ts-assertions');
 
 module.exports = function inklecate(args) {
-  const safeArgs = Array.prototype.slice.call(assertValid(
-    args,
-    'The args argument was not an array with a filepath.',
-    function (args) {
-      return Array.isArray(args) && args.length;
-    },
-  ));
-
-  const DEBUG = safeArgs.indexOf('DEBUG') > -1 || baseDEBUG;
-
-  const isPlaying = safeArgs.indexOf(ArgsEnum.Play) !== -1;
-  const re = new RegExp(`^${ArgsEnum.OutputFile} (.+)$`);
-  const outputArg = safeArgs.find(re.test.bind(re));
+  const argsGlob = args.glob;
+  const isPlaying = args.isPlaying;
+  const hasOutputArg = Boolean(args.outputFilepath);
   const isOutputting = !isPlaying || hasOutputArg;
-  const hasOutputArg = Boolean(outputArg);
+  const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
   const isCaching = isOutputting && !hasOutputArg;
+  const keepRunning = args.keepRunning;
+  const verbose = args.verbose;
+  const DEBUG = args.DEBUG;
 
-  const outputFilepathRaw =
-    outputArg && typeof outputArg.match === 'function' ?
-      outputArg.match(re)[1] :
-      getCacheFilepath();
+  const inputFilepaths = args.inputFilepaths.map(function map(filepath) {
+    return relative(process.cwd(), filepath);
+  });
 
-  const outputFilepath = relative(process.cwd(), outputFilepathRaw);
-
-  const inputFilepathRaw = safeArgs.splice(safeArgs.length - 1, 1)[0];
-  const inputFilepath = relative(process.cwd(), inputFilepathRaw);
-  const outputArgIndex = safeArgs.indexOf(outputArg);
-  safeArgs.splice(outputArgIndex, 1);
-
-  safeArgs.splice(
-    safeArgs.length,
-    0,
-    '-o',
+  const executeArgs = {
+    isCaching,
+    isPlaying,
+    keepRunning,
     outputFilepath,
-  );
+    verbose,
+    DEBUG,
+  };
 
-  safeArgs.splice(
-    safeArgs.length,
-    0,
-    inputFilepath,
-  );
+  return Promise.all(inputFilepaths.map(function map(inputFilepath) {
+    return new Promise(function cb(resolve, reject) {    
+      if (argsGlob) {
+        glob(filepath, function cb(err, matches) {
+          if (err) {
+            return reject(err);
+          }
 
-  return new Promise(function cb(resolve, reject) {
-    const proc = spawn(getInklecatePath(), safeArgs);
-
-    const rejector = quit.bind(null, reject);
-
-    proc.stdout.on('readable', function cb() {
-      const readout = proc.stdout.read();
-      if (readout) {
-        DEBUG && log('inklecate has emitted a message:');
-        log(String(readout));
-      }
-    });
-
-    proc.on('error', function cb(err) {
-      DEBUG && error('The inklecate-node package has encountered an error.');
-      rejector(err);
-    });
-
-    DEBUG && proc.on('message', function cb(msg) {
-      log(`inklecate has a message: ${msg}`);
-    });
-
-    proc.stderr.on('data', function cb(err) {
-      DEBUG && error('The inklecate-node package has encountered a stderr issue.');
-      rejector(err);
-    });
-
-    const chunks = [];
-    proc.stdout.on('data', function cb(chunk) {
-      const chunkStr = String(chunk);
-      if (isPlaying) {
-        playLine(chunkStr, stdin);
+          Promise.all(matches.map(function map(inputFilepath) {
+            return execute(Object.assign({}, executeArgs, { inputFilepath }));
+          })).then(resolve, reject);
+        });
       } else {
-        chunks.push(chunkStr);
-      }
-    });
-
-    DEBUG && proc.stdout.on('end', function cb() {
-      log('inklecate has closed its stdout channel.');
-    });
-
-    proc.on('exit', function cb(code, signal) {
-      DEBUG && log('inklecate is done.');
-
-      if (code > 0) {
-        return rejector(
-          `inklecate exited with code ${code}` +
-            `${signal ? ` and signal ${signal}` : ''}.`,
+        execute(Object.assign({}, executeArgs, { inputFilepath })).then(
+          resolve,
+          reject,
         );
       }
-
-      finish(Object.assign({
-        inputFilepath,
-        isCaching,
-        isPlaying,
-        outputFilepath,
-        reject,
-        resolve,
-      }, isPlaying ? {} : { compilerOutput: chunks }));
     });
-  });
+  }));
 };
