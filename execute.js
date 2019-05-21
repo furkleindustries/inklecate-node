@@ -15,12 +15,9 @@ const quit = require('./quit');
 module.exports = function execute(args) {
   const DEBUG = args.DEBUG || baseDEBUG;
 
-  debugger;
   const inputFilepath = args.inputFilepath;
   const isCaching = args.isCaching;
-  const outputFilepath = isCaching ?
-    getCacheFilepath(inputFilepath) :
-    args.outputFilepath;
+  const outputFilepath = isCaching ? getCacheFilepath() : args.outputFilepath;
 
   const isPlaying = args.isPlaying;
   const keepRunning = args.keepRunning;

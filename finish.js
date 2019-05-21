@@ -1,5 +1,6 @@
 const {
   readFile,
+  unlink,
 } = require('fs');
 
 module.exports = function finish(args) {

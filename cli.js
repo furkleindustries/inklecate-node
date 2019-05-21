@@ -1,11 +1,11 @@
 const baseDEBUG = require('./DEBUG');
 
-const ArgsEnum = require('./ArgsEnum');
 const {
   error,
   log,
 } = require('colorful-logging');
 const program = require('commander');
+const inklecate = require('./inklecate');
 const {
   version,
 } = require('./package.json');
@@ -45,7 +45,7 @@ const opts = Object.freeze({
   DEBUG: program.DEBUG,
 });
 
-require('./inklecate')(opts).then(
+inklecate(opts).then(
   function resolved(data) {
     DEBUG && log('inklecate-node has completed.');
     if (!data || !data.length) {
