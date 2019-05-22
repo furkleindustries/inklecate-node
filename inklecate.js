@@ -70,6 +70,8 @@ module.exports = function inklecate(args) {
           );
         }
       });
-    })).then(resolve, reject);
+    })).then(function resolved(data) {
+      return resolve(data.length > 1 ? data : data[0]);
+    }, reject);
   })
 };
