@@ -1,5 +1,7 @@
 # inklecate
 
+Install with `npm i -D inklecate-loader`.
+
 This package is a thin wrapper around [Inkle](https://inkle.com)'s [inklecate](https://github.com/inkle/ink/blob/master/inklecate/) tool for compiling and playing [Ink](https://github.com/inkle/ink) stories. It will not compile for client-side execution in a browser.
 
 The inklecate binaries were written solely by Inkle and this package is released under the same license as Ink. That license is MIT at the time of this writing, but if it changes, the license of this package should be considered to follow it.
