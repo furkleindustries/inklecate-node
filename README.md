@@ -45,7 +45,7 @@ If the output filepath argument is not provided, the file will be generated in a
 ## Other notes
 
 * How do I use this with Webpack?
-  Try [inklecate-webpack-loader](/furkleindustries/inklecate-webpack-loader/)
+  Try [inklecate-loader](/furkleindustries/inklecate-loader/)
 * How do I learn Ink?
   Start with the [interactive tutorial](https://furkleindustries/fictions/ink/ink_resources/ink-interactive-tutorial/). (The tutorial code is [here](https://github.com/furkleindustries/ink-interactive-tutorial), and makes use of this package.)
 * How do I use compile Ink source into JSON in the browser?
