@@ -15,7 +15,7 @@ const {
 
 program
   .version(version)
-  .usage('inklecate2 <options> <ink file>')
+  .usage('inklecate <options> ...<ink file(s)>')
   .option('-o, --outputFile <outputFile>', 'Output file name')
   .option('-c', 'Count all visits to knots, stitches and weave points, not\n' +
                   'just those referenced by TURNS_SINCE and read counts')

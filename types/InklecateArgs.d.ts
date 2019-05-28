@@ -1,4 +1,5 @@
 export interface InklecateArgs {
+  countAllVisits?: boolean;
   glob?: boolean;
   isPlaying?: boolean;
   outputFilepath?: string;
