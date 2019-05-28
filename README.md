@@ -1,6 +1,6 @@
 # inklecate
 
-Install with `npm i -D inklecate-loader`.
+Install with `npm i -D inklecate`.
 
 This package is a thin wrapper around [Inkle](https://inkle.com)'s [inklecate](https://github.com/inkle/ink/blob/master/inklecate/) tool for compiling and playing [Ink](https://github.com/inkle/ink) stories. It will not compile for client-side execution in a browser.
 
