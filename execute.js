@@ -5,6 +5,7 @@ const {
   spawn,
 } = require('child_process');
 const {
+  error,
   log,
 } = require('colorful-logging');
 const finish = require('./finish');
@@ -34,28 +35,34 @@ module.exports = function execute(args) {
     inputFilepath,
   ].filter(Boolean));
 
+  /* Inklecate seems in some or all cases to send its error messages over
+   * stdout, so if we encounter an error code on process exit, we need to make
+   * reference to the message. Without this, consumers of inklecate (and
+   * inklecate-loader) would not receive error messages at all. */
+  let maybeLastError = '';
+
   return new Promise(function cb(resolve, reject) {
     const rejector = quit.bind(null, reject);
 
     proc.stdout.on('readable', function cb() {
       const readout = proc.stdout.read();
       if (readout) {
-        DEBUG && log('inklecate has emitted a message:');
+        DEBUG && log('inklecate has emitted a readable event through stdout:');
         log((readout || '').toString().trim());
+        maybeLastError = readout;
       }
     });
 
-    proc.on('error', function cb(err) {
-      DEBUG && error('The inklecate-node package has encountered an error.');
+    proc.stderr.on('data', function cb(err) {
+      error(err, 'data');
+      DEBUG && error('inklecate has emited a data event through stderr:');
       return rejector(err);
     });
 
-    DEBUG && proc.on('message', function cb(msg) {
-      log(`inklecate has a message: ${msg}`);
-    });
-
-    proc.stderr.on('data', function cb(err) {
-      DEBUG && error('The inklecate-node package has encountered a stderr issue.');
+    proc.stderr.on('error', function cb(err) {
+      error(err);
+      error('error');
+      DEBUG && error('inklecate has emitted an error event through stderr:');
       return rejector(err);
     });
 
@@ -77,10 +84,11 @@ module.exports = function execute(args) {
       DEBUG && log('inklecate is done.');
 
       if (code > 0) {
-        return rejector(
+        return reject(new Error(
+          `${maybeLastError || ''}\n` +
           `inklecate exited with code ${code}` +
             `${signal ? ` and signal ${signal}` : ''}.`,
-        );
+        ));
       }
 
       const finishArgs = Object.assign(
