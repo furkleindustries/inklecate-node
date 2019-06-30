@@ -66,11 +66,6 @@ module.exports = function execute(args) {
       return rejector(err);
     });
 
-    proc.stderr.on('readable', function cb(err) {
-      DEBUG && error('The inklecate-node package has encountered a stderr issue.');
-      return rejector(err);
-    });
-
     const chunks = [];
     proc.stdout.on('data', function cb(chunk) {
       const chunkStr = String(chunk);
