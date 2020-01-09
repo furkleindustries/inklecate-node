@@ -1,3 +1,3 @@
-const DEBUG = false;
+const FORCE_DEBUG = false;
 
-module.exports = DEBUG || process.env.DEBUG;
+module.exports = FORCE_DEBUG || process.env.DEBUG;

@@ -1,77 +1,95 @@
+const { spawn } = require('child_process');
+const { log } = require('colorful-logging');
 const execute = require('./execute');
+const getInklecatePath = require('./getInklecatePath');
 const glob = require('glob');
-const {
-  relative,
-} = require('path');
+const path = require('path');
 
-module.exports = function inklecate(args) {
-  return new Promise(function cb(resolve, reject) {
-    if (!args) {
-      return reject('No args provided to inklecate method.');
+module.exports = (args) => new Promise((resolve, reject) => {
+  if (!args) {
+    return reject('No args provided to inklecate method.');
+  }
+
+  const argsGlob = args.glob;
+  const isPlaying = args.isPlaying;
+  const hasOutputArg = Boolean(args.outputFilepath);
+  const isOutputting = !isPlaying || hasOutputArg;
+  const outputFilepath = path.relative(process.cwd(), args.outputFilepath || '');
+  const isCaching = isOutputting && !hasOutputArg;
+  const keepRunning = args.keepRunning;
+  const verbose = args.verbose;
+  const DEBUG = args.DEBUG;
+
+  let inputFilepaths;
+  if (typeof args === 'string') {
+    inputFilepaths = [ args ];
+  } else if (typeof args.inputFilepaths === 'string') {
+    inputFilepaths = [ args.inputFilepaths ];
+  } else if (Array.isArray(args.inputFilepaths)) {
+    inputFilepaths = args.inputFilepaths;
+  } else if (typeof args.inputFilepath === 'string') {
+    inputFilepaths = [ args.inputFilepath ];
+  } else if (Array.isArray(args.inputFilepath)) {
+    inputFilepaths = args.inputFilepath;
+  }
+
+  if (!inputFilepaths || !inputFilepaths.length) {
+    return reject('No input filepaths provided to inklecate-node\'s ' +
+                  'inklecate method.');
+  }
+
+  if (isPlaying) {
+    if (inputFilepaths.length > 1) {
+      return reject('Only one filepath can be used for playing a file.');
     }
 
-    const argsGlob = args.glob;
-    const isPlaying = args.isPlaying;
-    const hasOutputArg = Boolean(args.outputFilepath);
-    const isOutputting = !isPlaying || hasOutputArg;
-    const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
-    const isCaching = isOutputting && !hasOutputArg;
-    const keepRunning = args.keepRunning;
-    const verbose = args.verbose;
-    const DEBUG = args.DEBUG;
+    return new Promise((resolve, reject) => spawn(
+        `${getInklecatePath()}`,
+        [
+          '-p',
+          path.resolve(process.cwd(), inputFilepaths[0]),
+        ],
+        { shell: true },
+      )
+        .on('message', log)
+        .on('error', reject)
+        .on('close', (code) => code ? reject(code) : resolve())
+    );
+  }
 
-    let inputFilepaths;
-    if (typeof args === 'string') {
-      inputFilepaths = [ args ];
-    } else if (typeof args.inputFilepaths === 'string') {
-      inputFilepaths = [ args.inputFilepaths ];
-    } else if (Array.isArray(args.inputFilepaths)) {
-      inputFilepaths = args.inputFilepaths;
-    } else if (typeof args.inputFilepath === 'string') {
-      inputFilepaths = [ args.inputFilepath ];
-    } else if (Array.isArray(args.inputFilepath)) {
-      inputFilepaths = args.inputFilepath;
-    }
+  inputFilepaths = inputFilepaths.map((filepath) => (
+    relative(process.cwd(), filepath)
+  ));
 
-    if (!inputFilepaths || !inputFilepaths.length) {
-      return reject('No input filepaths provided to inklecate-node\'s ' +
-                    'inklecate method.');
-    }
+  const executeArgs = {
+    isCaching,
+    isPlaying,
+    keepRunning,
+    outputFilepath,
+    verbose,
+    DEBUG,
+  };
 
-    inputFilepaths = inputFilepaths.map(function map(filepath) {
-      return relative(process.cwd(), filepath);
-    });
+  Promise.all(inputFilepaths.map((inputFilepath) => new Promise((resolve, reject) => {    
+      if (argsGlob) {
+        glob(inputFilepath, (err, matches) => {
+          if (err) {
+            return reject(err);
+          }
 
-    const executeArgs = {
-      isCaching,
-      isPlaying,
-      keepRunning,
-      outputFilepath,
-      verbose,
-      DEBUG,
-    };
+          const proms = matches.map((inputFilepath) => execute({
+            ...executeArgs,
+            ...{ inputFilepath },
+          }));
 
-    Promise.all(inputFilepaths.map(function map(inputFilepath) {
-      return new Promise(function cb(resolve, reject) {    
-        if (argsGlob) {
-          glob(inputFilepath, function cb(err, matches) {
-            if (err) {
-              return reject(err);
-            }
-
-            Promise.all(matches.map(function map(inputFilepath) {
-              return execute(Object.assign({}, executeArgs, { inputFilepath }));
-            })).then(resolve, reject);
-          });
-        } else {
-          execute(Object.assign({}, executeArgs, { inputFilepath })).then(
-            resolve,
-            reject,
-          );
-        }
-      });
-    })).then(function resolved(data) {
-      return resolve(data.length > 1 ? data : data[0]);
-    }, reject);
-  })
-};
+          Promise.all(proms).then(resolve, reject);
+        });
+      } else {
+        execute({
+          ...executeArgs,
+          ...{ inputFilepath },
+        }).then(resolve, reject);
+      }
+    })
+  )).then((data) => resolve(data.length === 1 ? data[0] : data));
+});

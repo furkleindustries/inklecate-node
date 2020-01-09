@@ -1,3 +1,1 @@
-module.exports = function quit(reject, err) {
-  return reject(err);
-};
+module.exports = (reject, err) => reject(err);

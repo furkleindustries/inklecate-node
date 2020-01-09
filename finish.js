@@ -3,7 +3,7 @@ const {
   unlink,
 } = require('fs');
 
-module.exports = function finish(args) {
+module.exports = (args) => {
   const compilerOutput = args.compilerOutput;
   const isCaching = args.isCaching;
   const isPlaying = args.isPlaying;
@@ -14,38 +14,40 @@ module.exports = function finish(args) {
     log('THE END');
   }
 
-  return new Promise(function cb(resolve, reject) {
-    readFile(outputFilepath, function cb(err, storyContentBuf) {
-      if (err) {
+  return new Promise(async (resolve, reject) => {
+    let storyContentBuf;
+    try {
+      storyContentBuf = await readFile(outputFilepath);
+    } catch (err) {
+      return reject(err);
+    }
+
+    const storyContent = JSON.parse(String(storyContentBuf).trim());
+    if (isCaching) {
+      let sourceBuf;
+      try {
+        sourceBuf = await readFile(inputFilepath);
+      } catch (err) {
         return reject(err);
       }
 
-      const storyContent = JSON.parse(String(storyContentBuf).trim());
-      if (isCaching) {
-        readFile(inputFilepath, function cb(err, sourceBuf) {
-          if (err) {
-            return reject(err);
-          }
+      const source = String(sourceBuf);
 
-          const source = String(sourceBuf);
-
-          unlink(outputFilepath, function cb(err) {
-            if (err) {
-              if (err.code !== 'ENOENT') {
-                return reject(err);
-              }
-            }
-
-            return resolve({
-              compilerOutput,
-              source,
-              storyContent,
-            });
-          });
-        });
-      } else {
-        return resolve(compilerOutput);
+      try {
+        await unlink(outputFilepath);
+      } catch (err) {
+        if (err.code !== 'ENOENT') {
+          return reject(err);
+        }
       }
-    });
-  })
+
+      return resolve({
+        compilerOutput,
+        source,
+        storyContent,
+      });
+    }
+
+    return resolve(compilerOutput);
+  });
 };

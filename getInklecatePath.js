@@ -3,10 +3,8 @@ const {
   join,
 } = require('path');
 
-module.exports = function getInklecatePath() {
-  if (process.platform === 'darwin') {
-    return join(getBinDir(), 'inklecate');
-  }
-
-  return join(getBinDir(), 'inklecate.exe');
-};
+module.exports = () => (
+  process.platform === 'darwin' ?
+    join(getBinDir(), 'inklecate') :
+    join(getBinDir(), 'inklecate.exe')
+);

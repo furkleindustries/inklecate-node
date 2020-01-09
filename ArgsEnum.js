@@ -4,6 +4,7 @@ module.exports = Object.freeze({
   KeepRunning: '-k',
   OutputFile: '-o',
   Play: '-p',
-  Verbose: '-v',  
+  Verbose: '-v',
+  Wasm: '-w',
   DEBUG: '--DEBUG',
 });
