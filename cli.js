@@ -16,15 +16,24 @@ const {
 program
   .version(version)
   .usage('inklecate <options> ...<ink file(s)>')
+  .option('-v', 'Get the version identifier.', () => {
+    log(version);
+    process.exit(0);
+  })
   .option('-o, --outputFile <outputFile>', 'Output file name')
   .option('-c', 'Count all visits to knots, stitches and weave points, not\n' +
                   'just those referenced by TURNS_SINCE and read counts')
   .option('-p, --play', 'Play mode')
-  .option('-v', 'Verbose mode - print compilation timings')
+  .option('--verbose', 'Verbose mode - print compilation timings')
   .option('-k', 'Keep inklecate running in play mode even after story is ' +
                 'complete')
+  .option(
+    '-W, --no-wasm',
+    'Compile with inklecate executable files for Windows/Linux or MacOS, ' +
+      'rather than the inklecate-wasm universal WebAssembly module.',
+  )
   .option('--glob', 'Allow glob compilation of multiple files.')
-  .option('--DEBUG', 'Enable debug mode for inklecate-node.')
+  .option('--DEBUG', 'Enable debug mode for inklecate-node (not inklecate).')
   .parse(process.argv);
 
 const DEBUG = baseDEBUG || program.DEBUG;
@@ -37,12 +46,13 @@ const inputFilepaths = assertValid(
 
 const opts = Object.freeze({
   inputFilepaths,
-  glob: program.glob,
-  keepRunning: program.k,
-  isPlaying: program.p || program.play,
-  outputFilepath: program.o || program.outputFile || null,
-  verbose: program.v,
-  DEBUG: program.DEBUG,
+  glob: Boolean(program.glob),
+  keepRunning: Boolean(program.k),
+  isPlaying: Boolean(program.play),
+  noWasm: !program.wasm,
+  outputFilepath: program.outputFile || null,
+  verbose: Boolean(program.verbose),
+  DEBUG: Boolean(program.DEBUG),
 });
 
 inklecate(opts).then(
@@ -53,18 +63,15 @@ inklecate(opts).then(
         (Array.isArray(data) && !data.length) ||
         !Object.keys(data).length)
     {
+      DEBUG && error('The return value from inklecate was null or undefined.');
       error('No result from inklecate-node.');
       return;
     }
 
+    DEBUG && log('inklecate-node is outputting the response.');
+
     const list = Array.isArray(data) ? data : [ data ];
-    list.forEach((datum) => {
-      if (datum &&
-          (datum.storyContent || (Array.isArray(datum) && datum.length)))
-      {
-        log(JSON.stringify(datum));
-      }
-    });
+    list.forEach(log);
   },
 
   error,

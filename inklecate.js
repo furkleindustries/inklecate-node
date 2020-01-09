@@ -1,9 +1,9 @@
-const { spawn } = require('child_process');
-const { log } = require('colorful-logging');
+// const { spawn } = require('child_process');
+// const { log } = require('colorful-logging');
 const execute = require('./execute');
-const getInklecatePath = require('./getInklecatePath');
+// const getInklecatePath = require('./getInklecatePath');
 const glob = require('glob');
-const path = require('path');
+const { relative } = require('path');
 
 module.exports = (args) => new Promise((resolve, reject) => {
   if (!args) {
@@ -14,10 +14,11 @@ module.exports = (args) => new Promise((resolve, reject) => {
   const isPlaying = args.isPlaying;
   const hasOutputArg = Boolean(args.outputFilepath);
   const isOutputting = !isPlaying || hasOutputArg;
-  const outputFilepath = path.relative(process.cwd(), args.outputFilepath || '');
+  const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
   const isCaching = isOutputting && !hasOutputArg;
   const keepRunning = args.keepRunning;
   const verbose = args.verbose;
+  const noWasm = args.noWasm;
   const DEBUG = args.DEBUG;
 
   let inputFilepaths;
@@ -39,7 +40,8 @@ module.exports = (args) => new Promise((resolve, reject) => {
   }
 
   if (isPlaying) {
-    if (inputFilepaths.length > 1) {
+    throw new Error('Not implemented yet.');
+    /*if (inputFilepaths.length > 1) {
       return reject('Only one filepath can be used for playing a file.');
     }
 
@@ -47,14 +49,14 @@ module.exports = (args) => new Promise((resolve, reject) => {
         `${getInklecatePath()}`,
         [
           '-p',
-          path.resolve(process.cwd(), inputFilepaths[0]),
+          resolve(process.cwd(), inputFilepaths[0]),
         ],
         { shell: true },
       )
         .on('message', log)
         .on('error', reject)
         .on('close', (code) => code ? reject(code) : resolve())
-    );
+    );*/
   }
 
   inputFilepaths = inputFilepaths.map((filepath) => (
@@ -65,31 +67,31 @@ module.exports = (args) => new Promise((resolve, reject) => {
     isCaching,
     isPlaying,
     keepRunning,
+    noWasm,
     outputFilepath,
     verbose,
     DEBUG,
   };
 
   Promise.all(inputFilepaths.map((inputFilepath) => new Promise((resolve, reject) => {    
-      if (argsGlob) {
-        glob(inputFilepath, (err, matches) => {
-          if (err) {
-            return reject(err);
-          }
+    if (argsGlob) {
+      glob(inputFilepath, (err, matches) => {
+        if (err) {
+          return reject(err);
+        }
 
-          const proms = matches.map((inputFilepath) => execute({
-            ...executeArgs,
-            ...{ inputFilepath },
-          }));
-
-          Promise.all(proms).then(resolve, reject);
-        });
-      } else {
-        execute({
+        const proms = matches.map((inputFilepath) => execute({
           ...executeArgs,
-          ...{ inputFilepath },
-        }).then(resolve, reject);
-      }
-    })
-  )).then((data) => resolve(data.length === 1 ? data[0] : data));
+          inputFilepath,
+        }));
+
+        Promise.all(proms).then(resolve, reject);
+      });
+    } else {
+      execute({
+        ...executeArgs,
+        inputFilepath,
+      }).then(resolve, reject);
+    }
+  }))).then((data) => resolve(data.length === 1 ? data[0] : data));
 });

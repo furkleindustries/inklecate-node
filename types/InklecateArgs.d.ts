@@ -1,9 +1,9 @@
 export interface InklecateArgs {
-  countAllVisits?: boolean;
-  glob?: boolean;
-  isPlaying?: boolean;
-  outputFilepath?: string;
-  keepRunning?: boolean;
-  inputFilepath?: string | string[];
-  inputFilepaths?: string | string[];
+  readonly countAllVisits?: boolean;
+  readonly glob?: boolean;
+  readonly keepRunning?: boolean;
+  readonly inputFilepath?: string | string[];
+  readonly inputFilepaths?: string | string[];
+  readonly isPlaying?: boolean;
+  readonly outputFilepath?: string;
 }

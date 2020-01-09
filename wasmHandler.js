@@ -8,7 +8,6 @@ const {
   readFile,
   writeFile,
 } = require('fs-extra');
-const quit = require('./quit');
 const { initializeMonoEnvironment } = require('inklecate-wasm');
 
 module.exports = async (args) => {
@@ -17,9 +16,10 @@ module.exports = async (args) => {
     isCaching,
     isPlaying,
     outputFilepath,
+    DEBUG,
   } = args;
 
-  const readProm = readFile(inputFilepath);
+  const readProm = readFile(inputFilepath, 'utf8');
   const compileProm = initializeMonoEnvironment();
 
   const [
@@ -30,16 +30,23 @@ module.exports = async (args) => {
     compileProm,
   ]);
 
-  const json = compile(ink);
-  await writeFile(json, outputFilepath);
+  const {
+    compilerOutput,
+    storyContent,
+    text,
+  } = compile(ink);
 
   const finishArgs = {
+    compilerOutput,
     inputFilepath,
-    isCaching,
     isPlaying,
+    isCaching,
     outputFilepath,
+    storyContent,
+    text,
+    DEBUG,
   };
 
-  finish(finishArgs).then(resolve, reject);
+  return finish(finishArgs);
 };
 

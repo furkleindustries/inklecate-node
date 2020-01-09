@@ -3,7 +3,7 @@ import {
 } from './InklecateStory';
 
 export interface InklecateReturn {
-  compilerOutput: string[];
-  source: string;
-  storyContent: InklecateStory;
+  readonly compilerOutput: string[];
+  readonly text: string;
+  readonly storyContent: InklecateStory;
 }

@@ -1,16 +1,24 @@
 const ArgsEnum = require('./ArgsEnum');
-const {
-  spawn,
-} = require('child_process');
+const { spawn } = require('child_process');
 const {
   error,
   log,
 } = require('colorful-logging');
+const DEBUG = require('./DEBUG');
 const finish = require('./finish');
+const { readFile } = require('fs-extra');
 const getInklecatePath = require('./getInklecatePath');
-const quit = require('./quit');
 
-module.exports = function executableHandler(args) {
+module.exports = (args) => {
+  const {
+    inputFilepath,
+    isCaching,
+    isPlaying,
+    keepRunning,
+    outputFilepath,
+    verbose,
+  } = args;
+
   const proc = spawn(getInklecatePath(), [
     isPlaying ? ArgsEnum.Play : null,
     keepRunning ? ArgsEnum.KeepRunning : null,
@@ -26,10 +34,8 @@ module.exports = function executableHandler(args) {
    * inklecate-loader) would not receive error messages at all. */
   let maybeLastError = '';
 
-  return new Promise(function cb(resolve, reject) {
-    const rejector = quit.bind(null, reject);
-
-    proc.stdout.on('readable', function cb() {
+  return new Promise((resolve, reject) => {
+    proc.stdout.on('readable', () => {
       const readout = proc.stdout.read();
       if (readout) {
         DEBUG && log('inklecate has emitted a readable event through stdout:');
@@ -38,20 +44,20 @@ module.exports = function executableHandler(args) {
       }
     });
 
-    proc.stderr.on('data', function cb(err) {
+    proc.stderr.on('data', (err) => {
       error(err);
       DEBUG && error('inklecate has emited a data event through stderr:');
-      return rejector(err);
+      return reject(err);
     });
 
-    proc.stderr.on('error', function cb(err) {
+    proc.stderr.on('error', (err) => {
       error(err);
       DEBUG && error('inklecate has emitted an error event through stderr:');
-      return rejector(err);
+      return reject(err);
     });
 
     const chunks = [];
-    proc.stdout.on('data', function cb(chunk) {
+    proc.stdout.on('data', (chunk) => {
       const chunkStr = String(chunk);
       if (isPlaying) {
         playLine(chunkStr, stdin);
@@ -60,11 +66,11 @@ module.exports = function executableHandler(args) {
       }
     });
 
-    DEBUG && proc.stdout.on('end', function cb() {
+    DEBUG && proc.stdout.on('end', () => {
       log('inklecate has closed its stdout channel.');
     });
 
-    proc.on('exit', function cb(code, signal) {
+    proc.on('exit', async (code, signal) => {
       DEBUG && log('inklecate is done.');
 
       if (code > 0) {
@@ -75,17 +81,33 @@ module.exports = function executableHandler(args) {
         ));
       }
 
-      const finishArgs = Object.assign(
-        {
-          inputFilepath,
-          isCaching,
-          isPlaying,
-          outputFilepath,
-        },
-        isPlaying ? {} : { compilerOutput: chunks },
-      );
+      
+      let text;
+      try {
+        text = await readFile(inputFilepath, 'utf8');
+      } catch (err) {
+        return reject(err);
+      }
 
-      finish(finishArgs).then(resolve, reject);
+      let storyContent;
+      try {
+        json = (await readFile(outputFilepath, 'utf8')).trim();
+        storyContent = JSON.parse(json);
+      } catch (err) {
+        return reject(err);
+      }
+
+      const finishArgs = {
+        inputFilepath,
+        isCaching,
+        isPlaying,
+        outputFilepath,
+        storyContent,
+        text,
+        DEBUG,
+      };
+
+      return finish(finishArgs).then(resolve, reject);
     });
   });
 };
