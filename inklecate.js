@@ -85,13 +85,13 @@ module.exports = (args) => new Promise((resolve, reject) => {
           inputFilepath,
         }));
 
-        Promise.all(proms).then(resolve, reject);
+        return Promise.all(proms).then(resolve, reject);
       });
-    } else {
-      execute({
-        ...executeArgs,
-        inputFilepath,
-      }).then(resolve, reject);
     }
+
+    return execute({
+      ...executeArgs,
+      inputFilepath,
+    }).then(resolve, reject);
   }))).then((data) => resolve(data.length === 1 ? data[0] : data));
 });

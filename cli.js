@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const baseDEBUG = require('./DEBUG');
 
 const {
@@ -6,12 +8,8 @@ const {
 } = require('colorful-logging');
 const program = require('commander');
 const inklecate = require('./inklecate');
-const {
-  version,
-} = require('./package.json');
-const {
-  assertValid,
-} = require('ts-assertions');
+const { version } = require('./package.json');
+const { assertValid } = require('ts-assertions');
 
 program
   .version(version)
