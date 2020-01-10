@@ -10,16 +10,17 @@ module.exports = (args) => new Promise((resolve, reject) => {
     return reject('No args provided to inklecate method.');
   }
 
-  const argsGlob = args.glob;
-  const isPlaying = args.isPlaying;
+  const countAllVisits = Boolean(args.countAllVisits);
+  const argsGlob = Boolean(args.glob);
+  const isPlaying = Boolean(args.isPlaying);
   const hasOutputArg = Boolean(args.outputFilepath);
-  const isOutputting = !isPlaying || hasOutputArg;
+  const isOutputting = Boolean(!isPlaying || hasOutputArg);
   const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
-  const isCaching = isOutputting && !hasOutputArg;
-  const keepRunning = args.keepRunning;
-  const verbose = args.verbose;
-  const noWasm = args.noWasm;
-  const DEBUG = args.DEBUG;
+  const isCaching = Boolean(isOutputting && !hasOutputArg);
+  const keepRunning = Boolean(args.keepRunning);
+  const verbose = Boolean(args.verbose);
+  const noWasm = Boolean(args.noWasm);
+  const DEBUG = Boolean(args.DEBUG);
 
   let inputFilepaths;
   if (typeof args === 'string') {
@@ -64,6 +65,7 @@ module.exports = (args) => new Promise((resolve, reject) => {
   ));
 
   const executeArgs = {
+    countAllVisits,
     isCaching,
     isPlaying,
     keepRunning,

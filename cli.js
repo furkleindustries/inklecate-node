@@ -44,6 +44,7 @@ const inputFilepaths = assertValid(
 
 const opts = Object.freeze({
   inputFilepaths,
+  countAllVisits: Boolean(program.c),
   glob: Boolean(program.glob),
   keepRunning: Boolean(program.k),
   isPlaying: Boolean(program.play),
