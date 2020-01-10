@@ -7,6 +7,7 @@ const wasmHandler = require('./wasmHandler');
 module.exports = (args) => {
   const DEBUG = args.DEBUG || baseDEBUG;
 
+  const countAllVisits = args.countAllVisits;
   const inputFilepath = args.inputFilepath;
   const isCaching = args.isCaching;
   const outputFilepath = isCaching ?
@@ -19,6 +20,7 @@ module.exports = (args) => {
   const noWasm = args.noWasm;
 
   const fullArgs = {
+    countAllVisits,
     inputFilepath,
     isCaching,
     isPlaying,
