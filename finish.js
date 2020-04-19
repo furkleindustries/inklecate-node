@@ -4,15 +4,10 @@ module.exports = (args) => {
   const {
     compilerOutput,
     isCaching,
-    isPlaying,
     outputFilepath,
     text,
     storyContent: fullStory,
   } = args;
-
-  if (isPlaying) {
-    log('THE END');
-  }
 
   const storyContent = fullStory;
 

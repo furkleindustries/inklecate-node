@@ -1,9 +1,9 @@
 export interface ExecuteArgs {
-  isCaching?: boolean;
-  isPlaying?: boolean;
-  keepRunning?: boolean;
-  inputFilepaths: string[];
-  outputFilepath?: string;
-  verbose?: boolean;
-  DEBUG?: boolean;
+  readonly countAllVisits?: boolean;
+  readonly isCaching?: boolean;
+  readonly inputFilepaths: string[];
+  readonly outputFilepath?: string;
+  readonly verbose?: boolean;
+  readonly DEBUG?: boolean;
+  readonly wasm?: boolean;
 }

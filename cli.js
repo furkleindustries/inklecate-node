@@ -21,14 +21,11 @@ program
   .option('-o, --outputFile <outputFile>', 'Output file name')
   .option('-c', 'Count all visits to knots, stitches and weave points, not\n' +
                   'just those referenced by TURNS_SINCE and read counts')
-  .option('-p, --play', 'Play mode')
   .option('--verbose', 'Verbose mode - print compilation timings')
-  .option('-k', 'Keep inklecate running in play mode even after story is ' +
-                'complete')
   .option(
-    '-W, --no-wasm',
-    'Compile with inklecate executable files for Windows/Linux or MacOS, ' +
-      'rather than the inklecate-wasm universal WebAssembly module.',
+    '-w, --wasm',
+    'Compile with the inklecate-wasm experimental WebAssembly module, ' +
+      'rather than the inklecate executable files for Windows/Linux or MacOS.',
   )
   .option('--glob', 'Allow glob compilation of multiple files.')
   .option('--DEBUG', 'Enable debug mode for inklecate-node (not inklecate).')
@@ -46,9 +43,7 @@ const opts = Object.freeze({
   inputFilepaths,
   countAllVisits: Boolean(program.c),
   glob: Boolean(program.glob),
-  keepRunning: Boolean(program.k),
-  isPlaying: Boolean(program.play),
-  noWasm: !program.wasm,
+  wasm: Boolean(program.wasm),
   outputFilepath: program.outputFile || null,
   verbose: Boolean(program.verbose),
   DEBUG: Boolean(program.DEBUG),

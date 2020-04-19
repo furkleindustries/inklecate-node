@@ -12,10 +12,11 @@ const { initializeMonoEnvironment } = require('inklecate-wasm');
 
 module.exports = async (args) => {
   const {
+    countAllVisits,
     inputFilepath,
     isCaching,
-    isPlaying,
     outputFilepath,
+    verbose,
     DEBUG,
   } = args;
 
@@ -34,12 +35,17 @@ module.exports = async (args) => {
     compilerOutput,
     storyContent,
     text,
-  } = compile(ink);
+  } = compile(
+    ink,
+    {
+      countAllVisits,
+      verbose,
+    },
+  );
 
   const finishArgs = {
     compilerOutput,
     inputFilepath,
-    isPlaying,
     isCaching,
     outputFilepath,
     storyContent,

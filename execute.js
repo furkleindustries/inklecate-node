@@ -14,28 +14,26 @@ module.exports = (args) => {
     getCacheFilepath(args.inputFilepath) :
     args.outputFilepath;
 
-  const isPlaying = args.isPlaying;
-  const keepRunning = args.keepRunning;
   const verbose = args.verbose;
-  const noWasm = args.noWasm;
+  const wasm = args.wasm;
 
   const fullArgs = {
     countAllVisits,
     inputFilepath,
     isCaching,
-    isPlaying,
-    keepRunning,
     outputFilepath,
     verbose,
     DEBUG,
   };
 
-  if (noWasm) {
-    DEBUG && log('inklecate-node is in noWasm mode and is using an executable inklecate.');
-    return executableHandler(fullArgs);
+  if (wasm) {
+    DEBUG && log('inklecate-node is in wasm mode and is using the experimental WebAssembly inklecate.');
+
+    return wasmHandler(fullArgs);
   }
 
-  DEBUG && log('inklecate-node is in wasm mode and is using a WebAssembly inklecate.');
 
-  return wasmHandler(fullArgs);
+  DEBUG && log('inklecate-node is using an executable inklecate.');
+
+  return executableHandler(fullArgs);
 };

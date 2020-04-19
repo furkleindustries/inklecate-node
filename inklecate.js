@@ -1,7 +1,4 @@
-// const { spawn } = require('child_process');
-// const { log } = require('colorful-logging');
 const execute = require('./execute');
-// const getInklecatePath = require('./getInklecatePath');
 const glob = require('glob');
 const { relative } = require('path');
 
@@ -12,14 +9,10 @@ module.exports = (args) => new Promise((resolve, reject) => {
 
   const countAllVisits = Boolean(args.countAllVisits);
   const argsGlob = Boolean(args.glob);
-  const isPlaying = Boolean(args.isPlaying);
-  const hasOutputArg = Boolean(args.outputFilepath);
-  const isOutputting = Boolean(!isPlaying || hasOutputArg);
   const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
-  const isCaching = Boolean(isOutputting && !hasOutputArg);
-  const keepRunning = Boolean(args.keepRunning);
+  const isCaching = Boolean(args.outputFilepath);
   const verbose = Boolean(args.verbose);
-  const noWasm = Boolean(args.noWasm);
+  const wasm = Boolean(args.wasm);
   const DEBUG = Boolean(args.DEBUG);
 
   let inputFilepaths;
@@ -40,26 +33,6 @@ module.exports = (args) => new Promise((resolve, reject) => {
                   'inklecate method.');
   }
 
-  if (isPlaying) {
-    throw new Error('Not implemented yet.');
-    /*if (inputFilepaths.length > 1) {
-      return reject('Only one filepath can be used for playing a file.');
-    }
-
-    return new Promise((resolve, reject) => spawn(
-        `${getInklecatePath()}`,
-        [
-          '-p',
-          resolve(process.cwd(), inputFilepaths[0]),
-        ],
-        { shell: true },
-      )
-        .on('message', log)
-        .on('error', reject)
-        .on('close', (code) => code ? reject(code) : resolve())
-    );*/
-  }
-
   inputFilepaths = inputFilepaths.map((filepath) => (
     relative(process.cwd(), filepath)
   ));
@@ -67,11 +40,9 @@ module.exports = (args) => new Promise((resolve, reject) => {
   const executeArgs = {
     countAllVisits,
     isCaching,
-    isPlaying,
-    keepRunning,
-    noWasm,
     outputFilepath,
     verbose,
+    wasm,
     DEBUG,
   };
 

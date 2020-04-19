@@ -18,8 +18,8 @@ CLI options:
   -o, --outputFile <outputFile>: Output file name.
   -c: Count all visits to knots, stitches and weave points, not just those referenced by TURNS_SINCE and read counts.
   -p: Play mode.
-  -v: Verbose mode - print compilation timings.
-  -k: Keep inklecate running in play mode even after story is complete.
+  --verbose: Verbose mode - print compilation timings.
+  -w, --wasm: Use the experimental WebAssembly compilation mode and not executable inklecate. 
   --glob: Treat input filepaths as globs. Glob matching uses minimatch.
   --DEBUG: Enable debug logging for inklecate-node.
 ```
@@ -30,9 +30,8 @@ The arguments for the module's `inklecate` function:
 function inklecate(args: {
   countAllVisits?: boolean;
   glob?: boolean;
-  isPlaying?: boolean;
+  wasm?: boolean;
   outputFilepath?: string;
-  keepRunning?: boolean;
 
   /* Both of these are used identically and you may use whichever you please. */
   inputFilepath?: string | string[];

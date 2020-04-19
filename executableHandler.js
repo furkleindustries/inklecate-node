@@ -11,20 +11,18 @@ const getInklecatePath = require('./getInklecatePath');
 
 module.exports = (args) => {
   const {
+    countAllVisits,
     inputFilepath,
     isCaching,
-    isPlaying,
-    keepRunning,
     outputFilepath,
     verbose,
   } = args;
 
   const proc = spawn(getInklecatePath(), [
-    isPlaying ? ArgsEnum.Play : null,
-    keepRunning ? ArgsEnum.KeepRunning : null,
+    countAllVisits ? ArgsEnum.CountAllVisits : null,
     verbose ? ArgsEnum.Verbose : null,
-    isPlaying ? null : ArgsEnum.OutputFile,
-    isPlaying ? null : outputFilepath,
+    ArgsEnum.OutputFile,
+    outputFilepath,
     inputFilepath,
   ].filter(Boolean));
 
@@ -59,11 +57,7 @@ module.exports = (args) => {
     const chunks = [];
     proc.stdout.on('data', (chunk) => {
       const chunkStr = String(chunk);
-      if (isPlaying) {
-        playLine(chunkStr, stdin);
-      } else {
-        chunks.push(chunkStr);
-      }
+      chunks.push(chunkStr);
     });
 
     DEBUG && proc.stdout.on('end', () => {
@@ -98,9 +92,9 @@ module.exports = (args) => {
       }
 
       const finishArgs = {
+        countAllVisits,
         inputFilepath,
         isCaching,
-        isPlaying,
         outputFilepath,
         storyContent,
         text,

@@ -1,10 +1,9 @@
 declare enum ArgsEnum {
   CountAllVisits = '-c',
   Glob = '--glob',
-  KeepRunning = '-k',
+  Wasm = '-w',
   OutputFile = '-o',
-  Play = '-p',
-  Verbose = '-v',  
+  Verbose = '-v',
   DEBUG = '--DEBUG',
 }
 

@@ -1,8 +1,7 @@
 module.exports = Object.freeze({
   CountAllVisits: '-c',
   Glob: '--glob',
-  KeepRunning: '-k',
-  NoWasm: '-W',
+  Wasm: '-w',
   OutputFile: '-o',
   Play: '-p',
   Verbose: '-v',

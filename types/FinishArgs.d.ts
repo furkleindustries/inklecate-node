@@ -6,5 +6,5 @@ export interface FinishArgs extends InklecateReturn {
   readonly inputFilepath: string;
   readonly outputFilepath: string;
   readonly isCaching?: boolean;
-  readonly isPlaying?: boolean;
+  readonly DEBUG?: boolean;  
 }
