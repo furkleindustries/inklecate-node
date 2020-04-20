@@ -10,7 +10,7 @@ module.exports = (args) => {
   const countAllVisits = args.countAllVisits;
   const inputFilepath = args.inputFilepath;
   const isCaching = args.isCaching;
-  const outputFilepath = isCaching ?
+  const outputFilepath = isCaching && args.outputFilepath ?
     getCacheFilepath(args.inputFilepath) :
     args.outputFilepath;
 
