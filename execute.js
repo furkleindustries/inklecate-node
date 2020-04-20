@@ -14,6 +14,10 @@ module.exports = (args) => {
     getCacheFilepath(args.inputFilepath) :
     args.outputFilepath;
 
+  if (outputFilepath === inputFilepath) {
+    throw new Error('Output filepath was the same as input filepath. Aborting to prevent any potential data loss.')
+  }
+
   const verbose = args.verbose;
   const wasm = args.wasm;
 
