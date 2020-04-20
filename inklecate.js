@@ -9,8 +9,11 @@ module.exports = (args) => new Promise((resolve, reject) => {
 
   const countAllVisits = Boolean(args.countAllVisits);
   const argsGlob = Boolean(args.glob);
-  const outputFilepath = relative(process.cwd(), args.outputFilepath || '');
-  const isCaching = Boolean(args.outputFilepath);
+  const outputFilepath = args.outputFilepath ?
+    relative(process.cwd(), args.outputFilepath) :
+      null;
+
+  const isCaching = Boolean(outputFilepath);
   const verbose = Boolean(args.verbose);
   const wasm = Boolean(args.wasm);
   const DEBUG = Boolean(args.DEBUG);

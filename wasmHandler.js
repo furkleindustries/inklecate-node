@@ -6,7 +6,6 @@ const {
 const finish = require('./finish');
 const {
   readFile,
-  writeFile,
 } = require('fs-extra');
 const { initializeMonoEnvironment } = require('inklecate-wasm');
 
