@@ -11,7 +11,7 @@ module.exports = (args) => new Promise((resolve, reject) => {
   const argsGlob = Boolean(args.glob);
   const outputFilepath = args.outputFilepath ?
     relative(process.cwd(), args.outputFilepath) :
-      null;
+    null;
 
   const isCaching = Boolean(outputFilepath);
   const verbose = Boolean(args.verbose);
