@@ -2,10 +2,8 @@
 
 const baseDEBUG = require('./DEBUG');
 
-const {
-  error,
-  log,
-} = require('colorful-logging');
+const error = console.error
+const log = console.log
 const program = require('commander');
 const inklecate = require('./inklecate');
 const { version } = require('./package.json');
