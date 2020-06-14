@@ -124,7 +124,12 @@
             Construct a Story object using a JSON string compiled through inklecate.
             </summary>
         </member>
-        <member name="M:Ink.Runtime.Story.ToJsonString">
+        <member name="M:Ink.Runtime.Story.ToJson">
+            <summary>
+            The Story itself in JSON representation.
+            </summary>
+        </member>
+        <member name="M:Ink.Runtime.Story.ToJson(System.IO.Stream)">
             <summary>
             The Story itself in JSON representation.
             </summary>
@@ -192,6 +197,24 @@
             output at a time.
             </summary>
             <returns>The resulting text evaluated by the ink engine, concatenated together.</returns>
+        </member>
+        <member name="M:Ink.Runtime.Story.CopyStateForBackgroundThreadSave">
+            <summary>
+            Advanced usage!
+            If you have a large story, and saving state to JSON takes too long for your
+            framerate, you can temporarily freeze a copy of the state for saving on 
+            a separate thread. Internally, the engine maintains a "diff patch".
+            When you've finished saving your state, call BackgroundSaveComplete()
+            and that diff patch will be applied, allowing the story to continue
+            in its usual mode.
+            </summary>
+            <returns>The state for background thread save.</returns>
+        </member>
+        <member name="M:Ink.Runtime.Story.BackgroundSaveComplete">
+            <summary>
+            See CopyStateForBackgroundThreadSave. This method releases the
+            "frozen" save state, applying its patch that it was using internally.
+            </summary>
         </member>
         <member name="M:Ink.Runtime.Story.PerformLogicAndFlowControl(Ink.Runtime.Object)">
             <summary>
@@ -462,6 +485,18 @@
             Enumerator to allow iteration over all global variables by name.
             </summary>
         </member>
+        <member name="F:Ink.Runtime.VariablesState.dontSaveDefaultValues">
+            <summary>
+            When saving out JSON state, we can skip saving global values that
+            remain equal to the initial values that were declared in ink.
+            This makes the save file (potentially) much smaller assuming that
+            at least a portion of the globals haven't changed. However, it
+            can also take marginally longer to save in the case that the 
+            majority HAVE changed, since it has to compare all globals.
+            It may also be useful to turn this off for testing worst case
+            save timing.
+            </summary>
+        </member>
         <member name="T:Ink.Runtime.StoryState">
             <summary>
             All story state information is included in the StoryState class,
@@ -481,6 +516,12 @@
             Exports the current state to json format, in order to save the game.
             </summary>
             <returns>The save state in json format.</returns>
+        </member>
+        <member name="M:Ink.Runtime.StoryState.ToJson(System.IO.Stream)">
+            <summary>
+            Exports the current state to json format, in order to save the game.
+            For this overload you can pass in a custom stream, such as a FileStream.
+            </summary>
         </member>
         <member name="M:Ink.Runtime.StoryState.LoadJson(System.String)">
             <summary>
@@ -505,14 +546,6 @@
         <member name="P:Ink.Runtime.StoryState.currentPathString">
             <summary>
             String representation of the location where the story currently is.
-            </summary>
-        </member>
-        <member name="P:Ink.Runtime.StoryState.jsonToken">
-            <summary>
-            Object representation of full JSON state. Usually you should use
-            LoadJson and ToJson since they serialise directly to string for you.
-            But it may be useful to get the object representation so that you
-            can integrate it into your own serialisation system.
             </summary>
         </member>
         <member name="M:Ink.Runtime.StoryState.ForceEnd">
@@ -832,6 +865,11 @@
             that has been recorded?
             </summary>
             <value><c>true</c> if has children; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Ink.Runtime.ProfileNode.totalMillisecs">
+            <summary>
+            Total number of milliseconds this node has been active for.
+            </summary>
         </member>
         <member name="P:Ink.Runtime.ProfileNode.descendingOrderedNodes">
             <summary>
