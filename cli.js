@@ -20,11 +20,6 @@ program
   .option('-c', 'Count all visits to knots, stitches and weave points, not\n' +
                   'just those referenced by TURNS_SINCE and read counts')
   .option('--verbose', 'Verbose mode - print compilation timings')
-  .option(
-    '-w, --wasm',
-    'Compile with the inklecate-wasm experimental WebAssembly module, ' +
-      'rather than the inklecate executable files for Windows/Linux or MacOS.',
-  )
   .option('--glob', 'Allow glob compilation of multiple files.')
   .option('--DEBUG', 'Enable debug mode for inklecate-node (not inklecate).')
   .parse(process.argv);
@@ -41,7 +36,6 @@ const opts = Object.freeze({
   inputFilepaths,
   countAllVisits: Boolean(program.c),
   glob: Boolean(program.glob),
-  wasm: Boolean(program.wasm),
   outputFilepath: program.outputFile || null,
   verbose: Boolean(program.verbose),
   DEBUG: Boolean(program.DEBUG),

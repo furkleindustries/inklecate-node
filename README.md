@@ -19,7 +19,6 @@ CLI options:
   -c: Count all visits to knots, stitches and weave points, not just those referenced by TURNS_SINCE and read counts.
   -p: Play mode.
   --verbose: Verbose mode - print compilation timings.
-  -w, --wasm: Use the experimental WebAssembly compilation mode and not executable inklecate. 
   --glob: Treat input filepaths as globs. Glob matching uses minimatch.
   --DEBUG: Enable debug logging for inklecate-node.
 ```
@@ -30,7 +29,6 @@ The arguments for the module's `inklecate` function:
 function inklecate(args: {
   countAllVisits?: boolean;
   glob?: boolean;
-  wasm?: boolean;
   outputFilepath?: string;
 
   /* Both of these are used identically and you may use whichever you please. */
@@ -49,5 +47,3 @@ If the output filepath argument is not provided, the file will be generated in a
   Try [inklecate-loader](/furkleindustries/inklecate-loader/)
 * How do I learn Ink?
   Start with the [interactive tutorial](https://furkleindustries/fictions/ink/ink_resources/ink-interactive-tutorial/). (The tutorial code is [here](https://github.com/furkleindustries/ink-interactive-tutorial), and makes use of this package.)
-* How do I use compile Ink source into JSON in the browser?
-  A solution for this is currently being developed at [inklecate-wasm](https://github.com/furkleindustries/inklecate-wasm) but is incomplete.

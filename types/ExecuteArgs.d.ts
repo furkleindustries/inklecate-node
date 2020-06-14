@@ -5,5 +5,4 @@ export interface ExecuteArgs {
   readonly outputFilepath?: string;
   readonly verbose?: boolean;
   readonly DEBUG?: boolean;
-  readonly wasm?: boolean;
 }
