@@ -4,5 +4,4 @@ export interface InklecateArgs {
   readonly inputFilepath?: string | string[];
   readonly inputFilepaths?: string | string[];
   readonly outputFilepath?: string;
-  readonly wasm?: boolean;
 }

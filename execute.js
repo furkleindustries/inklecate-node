@@ -1,8 +1,7 @@
-const { log } = require('colorful-logging');
+const log = console.log;
 const baseDEBUG = require('./DEBUG');
 const executableHandler = require('./executableHandler');
 const getCacheFilepath = require('./getCacheFilepath');
-const wasmHandler = require('./wasmHandler');
 
 module.exports = (args) => {
   const DEBUG = args.DEBUG || baseDEBUG;
@@ -19,7 +18,6 @@ module.exports = (args) => {
   }
 
   const verbose = args.verbose;
-  const wasm = args.wasm;
 
   const fullArgs = {
     countAllVisits,
@@ -29,13 +27,6 @@ module.exports = (args) => {
     verbose,
     DEBUG,
   };
-
-  if (wasm) {
-    DEBUG && log('inklecate-node is in wasm mode and is using the experimental WebAssembly inklecate.');
-
-    return wasmHandler(fullArgs);
-  }
-
 
   DEBUG && log('inklecate-node is using an executable inklecate.');
 
