@@ -1,9 +1,7 @@
 const ArgsEnum = require('./ArgsEnum');
 const { spawn } = require('child_process');
-const {
-  error,
-  log,
-} = require('colorful-logging');
+const error = console.error;
+const log = console.log;
 const DEBUG = require('./DEBUG');
 const finish = require('./finish');
 const { readFile } = require('fs-extra');

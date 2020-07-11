@@ -2,8 +2,8 @@
 INCLUDE for-inclusion.ink
 
 /* InkLogic */
-VAR logic = 'logic'
-~ logic = 'bar'
+VAR logic = "logic"
+~ logic = "bar"
 
 /* InkAuthorWarning */
 TODO: Author warning!
@@ -22,7 +22,7 @@ TODO: Author warning!
 
 
 /* InkExpression */
-{logic == 'logic': expression}
+{logic == "logic": expression}
 
 /* InkWhitespace */
 

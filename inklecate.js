@@ -15,7 +15,6 @@ module.exports = (args) => new Promise((resolve, reject) => {
 
   const isCaching = Boolean(outputFilepath);
   const verbose = Boolean(args.verbose);
-  const wasm = Boolean(args.wasm);
   const DEBUG = Boolean(args.DEBUG);
 
   let inputFilepaths;
@@ -45,7 +44,6 @@ module.exports = (args) => new Promise((resolve, reject) => {
     isCaching,
     outputFilepath,
     verbose,
-    wasm,
     DEBUG,
   };
 
