@@ -17,27 +17,21 @@ CLI options:
 
   -o, --outputFile <outputFile>: Output file name.
   -c: Count all visits to knots, stitches and weave points, not just those referenced by TURNS_SINCE and read counts.
-  -p: Play mode.
   --verbose: Verbose mode - print compilation timings.
-  --glob: Treat input filepaths as globs. Glob matching uses minimatch.
   --DEBUG: Enable debug logging for inklecate-node.
 ```
 
 The arguments for the module's `inklecate` function:
 
-```javascript
+```js
 function inklecate(args: {
   countAllVisits?: boolean;
-  glob?: boolean;
   outputFilepath?: string;
-
-  /* Both of these are used identically and you may use whichever you please. */
-  inputFilepath?: string | string[];
-  inputFilepaths?: string | string[];
-}): Promise<InklecateReturn | InklecateReturn[]>;
+  inputFilepath?: string;
+}): Promise<InklecateReturn>;
 ```
 
-The single positional argument is the input filepath. This argument is variadic and you may include as many input filepaths as you like, though this disallows choosing an output filepath.
+The single positional argument is the input filepath.
 
 If the output filepath argument is not provided, the file will be generated in a cache location and output as plain text JSON (in CLI mode) or a plain JavaScript object (as a node module).
 

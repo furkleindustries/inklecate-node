@@ -7,6 +7,6 @@ import {
 
 declare function finish(
   args: FinishArgs,
-): Promise<InklecateReturn | InklecateReturn[]>;
+): Promise<InklecateReturn>;
 
 export = finish;

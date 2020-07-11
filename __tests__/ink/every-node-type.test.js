@@ -1,7 +1,7 @@
 const execute = require('../../execute');
 const path = require('path');
 
-const output = require('./hello-world.ink.json');
+const output = require('./for-inclusion.ink.json');
 
 describe('Hello world test.', () => {
   it('Tests the hello world.', () => {
@@ -10,14 +10,20 @@ describe('Hello world test.', () => {
     const data = execute({
       countAllVisits: true,
       isCaching: false,
-      inputFilepath: path.join(__dirname, 'hello-world.ink'),
+      inputFilepath: path.join(__dirname, 'for-inclusion.ink'),
       outputFilepath: null,
       verbose: false,
       DEBUG: false,
     });
   
     return expect(data.then((inkRet) => {
-      return inkRet.storyContent;
-    })).resolves.toMatchObject(output);
+      return {
+        compilerOutput: inkRet.compilerOutput,
+        storyContent: inkRet.storyContent,
+      };
+    })).resolves.toMatchObject({
+      compilerOutput: [],
+      storyContent: output,
+    });
   });
 });

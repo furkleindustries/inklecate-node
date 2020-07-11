@@ -30,26 +30,33 @@ module.exports = (args) => {
    * inklecate-loader) would not receive error messages at all. */
   let maybeLastError = '';
 
+  const compilerOutput = [];
+
   return new Promise((resolve, reject) => {
     proc.stdout.on('readable', () => {
       const readout = proc.stdout.read();
       if (readout) {
-        DEBUG && log('inklecate has emitted a readable event through stdout:');
-        log((readout || '').toString().trim());
-        maybeLastError = readout;
+        const output = (readout || '').toString().trim();
+        if (output) {
+          DEBUG && log('inklecate has emitted a readable event through stdout.');
+          compilerOutput.push(output);
+        }
       }
     });
 
-    proc.stderr.on('data', (err) => {
-      error(err);
-      DEBUG && error('inklecate has emited a data event through stderr:');
-      return reject(err);
+    proc.stderr.on('data', (data) => {
+      if (data) {
+        DEBUG && warn('inklecate has emited a data event through stderr:');
+        compilerOutput.push(data);
+      }
     });
 
     proc.stderr.on('error', (err) => {
-      error(err);
-      DEBUG && error('inklecate has emitted an error event through stderr:');
-      return reject(err);
+      if (err) {
+        DEBUG && error('inklecate has emited a error event through stderr:');
+        compilerOutput.push(err);
+        return reject(compilerOutput);
+      }
     });
 
     const chunks = [];
@@ -66,14 +73,13 @@ module.exports = (args) => {
       DEBUG && log('inklecate is done.');
 
       if (code > 0) {
+        error(compilerOutput);
         return reject(new Error(
-          `${maybeLastError || ''}\n` +
           `inklecate exited with code ${code}` +
             `${signal ? ` and signal ${signal}` : ''}.`,
         ));
       }
 
-      
       let text;
       try {
         text = await readFile(inputFilepath, 'utf8');
@@ -90,6 +96,7 @@ module.exports = (args) => {
       }
 
       const finishArgs = {
+        compilerOutput,
         countAllVisits,
         inputFilepath,
         isCaching,

@@ -11,7 +11,7 @@ const { assertValid } = require('ts-assertions');
 
 program
   .version(version)
-  .usage('inklecate <options> ...<ink file(s)>')
+  .usage('inklecate <options> <inputFilepath>')
   .option('-v', 'Get the version identifier.', () => {
     log(version);
     process.exit(0);
@@ -20,22 +20,20 @@ program
   .option('-c', 'Count all visits to knots, stitches and weave points, not\n' +
                   'just those referenced by TURNS_SINCE and read counts')
   .option('--verbose', 'Verbose mode - print compilation timings')
-  .option('--glob', 'Allow glob compilation of multiple files.')
   .option('--DEBUG', 'Enable debug mode for inklecate-node (not inklecate).')
   .parse(process.argv);
 
 const DEBUG = baseDEBUG || program.DEBUG;
 
-const inputFilepaths = assertValid(
-  program.args.filter((arg) => arg[0] !== '-'),
-  'No input filepaths were found.',
+const inputFilepath = assertValid(
+  program.args.find((arg) => arg[0] !== '-'),
+  'No input filepath was found.',
   (result) => result.length,
 );
 
 const opts = Object.freeze({
-  inputFilepaths,
+  inputFilepath,
   countAllVisits: Boolean(program.c),
-  glob: Boolean(program.glob),
   outputFilepath: program.outputFile || null,
   verbose: Boolean(program.verbose),
   DEBUG: Boolean(program.DEBUG),
@@ -56,8 +54,7 @@ inklecate(opts).then(
 
     DEBUG && log('inklecate-node is outputting the response.');
 
-    const list = Array.isArray(data) ? data : [ data ];
-    list.forEach(log);
+    log(data);
   },
 
   error,

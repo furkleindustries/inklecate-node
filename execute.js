@@ -28,7 +28,7 @@ module.exports = (args) => {
     DEBUG,
   };
 
-  DEBUG && log('inklecate-node is using an executable inklecate.');
+  DEBUG && log('inklecate-node is using an executable inklecate.', fullArgs);
 
   return executableHandler(fullArgs);
 };

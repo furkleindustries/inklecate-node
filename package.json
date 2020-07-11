@@ -1,12 +1,12 @@
 {
   "name": "inklecate",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A tiny wrapper around the desktop executables for ink's command-line Ink language compiler.",
   "main": "index.js",
   "module": "index.js",
   "bin": "./cli.js",
   "scripts": {
-    "test": "./node_modules/jest/bin/jest.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -28,12 +28,13 @@
   "dependencies": {
     "commander": "^2.20.3",
     "fs-extra": "^8.1.0",
-    "glob": "^7.1.6",
     "ts-assertions": "^2.0.5",
-    "uuid": "^3.4.0"
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.4",
-    "@types/node": "^12.12.47"
+    "@types/node": "^12.12.47",
+    "jest": "^26.1.0",
+    "jest-cli": "^26.1.0"
   }
 }

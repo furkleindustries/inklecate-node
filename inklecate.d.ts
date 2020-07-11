@@ -8,6 +8,6 @@ import {
 declare function inklecate(args: string): Promise<InklecateReturn>;
 declare function inklecate(
   args: InklecateArgs,
-): Promise<InklecateReturn | InklecateReturn[]>;
+): Promise<InklecateReturn>;
 
 export = inklecate;

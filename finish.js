@@ -20,7 +20,6 @@ module.exports = (args) => {
           return reject(err);
         }
       }
-
     }
 
     return resolve({

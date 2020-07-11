@@ -1,8 +1,8 @@
 const { join } = require('path');
-const uuid5 = require('uuid/v5');
+const { v5 } = require('uuid');
 
 const cacheDir = join(__dirname, 'cache');
 
-module.exports = (filepath) => (
-  join(cacheDir, `${uuid5(filepath, uuid5.URL)}.json`)
-);
+module.exports = (filepath) => {
+  return join(cacheDir, `${v5(filepath, v5.URL)}.json`)
+};

@@ -1,5 +1,4 @@
 const execute = require('./execute');
-const glob = require('glob');
 const { relative } = require('path');
 
 module.exports = (args) => new Promise((resolve, reject) => {
@@ -8,7 +7,6 @@ module.exports = (args) => new Promise((resolve, reject) => {
   }
 
   const countAllVisits = Boolean(args.countAllVisits);
-  const argsGlob = Boolean(args.glob);
   const outputFilepath = args.outputFilepath ?
     relative(process.cwd(), args.outputFilepath) :
     null;
@@ -17,27 +15,12 @@ module.exports = (args) => new Promise((resolve, reject) => {
   const verbose = Boolean(args.verbose);
   const DEBUG = Boolean(args.DEBUG);
 
-  let inputFilepaths;
-  if (typeof args === 'string') {
-    inputFilepaths = [ args ];
-  } else if (typeof args.inputFilepaths === 'string') {
-    inputFilepaths = [ args.inputFilepaths ];
-  } else if (Array.isArray(args.inputFilepaths)) {
-    inputFilepaths = args.inputFilepaths;
-  } else if (typeof args.inputFilepath === 'string') {
-    inputFilepaths = [ args.inputFilepath ];
-  } else if (Array.isArray(args.inputFilepath)) {
-    inputFilepaths = args.inputFilepath;
-  }
+  const inputFilepath = relative(process.cwd(), args.inputFilepath);
 
-  if (!inputFilepaths || !inputFilepaths.length) {
-    return reject('No input filepaths provided to inklecate-node\'s ' +
+  if (!inputFilepath) {
+    return reject('No input filepath provided to inklecate-node\'s ' +
                   'inklecate method.');
   }
-
-  inputFilepaths = inputFilepaths.map((filepath) => (
-    relative(process.cwd(), filepath)
-  ));
 
   const executeArgs = {
     countAllVisits,
@@ -47,25 +30,8 @@ module.exports = (args) => new Promise((resolve, reject) => {
     DEBUG,
   };
 
-  Promise.all(inputFilepaths.map((inputFilepath) => new Promise((resolve, reject) => {    
-    if (argsGlob) {
-      glob(inputFilepath, (err, matches) => {
-        if (err) {
-          return reject(err);
-        }
-
-        const proms = matches.map((inputFilepath) => execute({
-          ...executeArgs,
-          inputFilepath,
-        }));
-
-        return Promise.all(proms).then(resolve, reject);
-      });
-    }
-
-    return execute({
-      ...executeArgs,
-      inputFilepath,
-    }).then(resolve, reject);
-  }))).then((data) => resolve(data.length === 1 ? data[0] : data));
+  return execute({
+    ...executeArgs,
+    inputFilepath,
+  });
 });

@@ -7,6 +7,6 @@ import {
 
 declare function execute(
   args: ExecuteArgs,
-): Promise<InklecateReturn | InklecateReturn[]>;
+): Promise<InklecateReturn>;
 
 export = execute;

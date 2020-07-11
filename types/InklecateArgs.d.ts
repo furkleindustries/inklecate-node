@@ -1,7 +1,5 @@
 export interface InklecateArgs {
   readonly countAllVisits?: boolean;
-  readonly glob?: boolean;
-  readonly inputFilepath?: string | string[];
-  readonly inputFilepaths?: string | string[];
+  readonly inputFilepath?: string;
   readonly outputFilepath?: string;
 }
