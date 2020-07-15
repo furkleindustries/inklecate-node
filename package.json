@@ -1,12 +1,13 @@
 {
   "name": "inklecate",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "description": "A tiny wrapper around the desktop executables for ink's command-line Ink language compiler.",
   "main": "index.js",
   "module": "index.js",
   "bin": "./cli.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run test"
   },
   "repository": {
     "type": "git",

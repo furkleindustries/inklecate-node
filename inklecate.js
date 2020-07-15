@@ -11,7 +11,7 @@ module.exports = (args) => new Promise((resolve, reject) => {
     relative(process.cwd(), args.outputFilepath) :
     null;
 
-  const isCaching = Boolean(outputFilepath);
+  const isCaching = Boolean(!outputFilepath);
   const verbose = Boolean(args.verbose);
   const DEBUG = Boolean(args.DEBUG);
 
@@ -33,5 +33,5 @@ module.exports = (args) => new Promise((resolve, reject) => {
   return execute({
     ...executeArgs,
     inputFilepath,
-  });
+  }).then(resolve, reject);
 });
