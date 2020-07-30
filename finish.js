@@ -20,6 +20,10 @@ module.exports = (args) => {
           return reject(err);
         }
       }
+    } else {
+      compilerOutput.forEach((item) => {
+        console.log(item);
+      });
     }
 
     return resolve({

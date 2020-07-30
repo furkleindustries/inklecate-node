@@ -1,16 +1,16 @@
 const execute = require('../../execute');
 const path = require('path');
 
-const output = require('./for-inclusion.ink.json');
+const output = require('./every-node-type.ink.json');
 
-describe('Hello world test.', () => {
-  it('Tests the hello world.', () => {
+describe('Every node type test.', () => {
+  it('Tests every node type.', () => {
     expect.assertions(1);
   
     const data = execute({
       countAllVisits: true,
       isCaching: false,
-      inputFilepath: path.join(__dirname, 'for-inclusion.ink'),
+      inputFilepath: path.join(__dirname, 'every-node-type.ink'),
       outputFilepath: null,
       verbose: false,
       DEBUG: false,
@@ -22,7 +22,10 @@ describe('Hello world test.', () => {
         storyContent: inkRet.storyContent,
       };
     })).resolves.toMatchObject({
-      compilerOutput: [],
+      compilerOutput: [
+        `TODO: 'every-node-type.ink' line 9: Author warning!`
+      ],
+
       storyContent: output,
     });
   });

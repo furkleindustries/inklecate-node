@@ -24,12 +24,6 @@ module.exports = (args) => {
     inputFilepath,
   ].filter(Boolean));
 
-  /* Inklecate seems in some or all cases to send its error messages over
-   * stdout, so if we encounter an error code on process exit, we need to make
-   * reference to the message. Without this, consumers of inklecate (and
-   * inklecate-loader) would not receive error messages at all. */
-  let maybeLastError = '';
-
   const compilerOutput = [];
 
   return new Promise((resolve, reject) => {
@@ -39,7 +33,7 @@ module.exports = (args) => {
         const output = (readout || '').toString().trim();
         if (output) {
           DEBUG && log('inklecate has emitted a readable event through stdout.');
-          compilerOutput.push(output);
+          compilerOutput.push(output.toString());
         }
       }
     });
@@ -47,22 +41,21 @@ module.exports = (args) => {
     proc.stderr.on('data', (data) => {
       if (data) {
         DEBUG && warn('inklecate has emited a data event through stderr:');
-        compilerOutput.push(data);
+        compilerOutput.push(data.toString());
       }
     });
 
     proc.stderr.on('error', (err) => {
       if (err) {
         DEBUG && error('inklecate has emited a error event through stderr:');
-        compilerOutput.push(err);
+        compilerOutput.push(err.toString());
         return reject(compilerOutput);
       }
     });
 
     const chunks = [];
     proc.stdout.on('data', (chunk) => {
-      const chunkStr = String(chunk);
-      chunks.push(chunkStr);
+      chunks.push(chunk.toString());
     });
 
     DEBUG && proc.stdout.on('end', () => {
