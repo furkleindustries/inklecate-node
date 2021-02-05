@@ -16,13 +16,17 @@ module.exports = (args) => {
     verbose,
   } = args;
 
-  const proc = spawn(getInklecatePath(), [
+  const opts = [
     countAllVisits ? ArgsEnum.CountAllVisits : null,
     verbose ? ArgsEnum.Verbose : null,
     ArgsEnum.OutputFile,
     outputFilepath,
     inputFilepath,
-  ].filter(Boolean));
+  ].filter(Boolean);
+
+  const proc = (process.platform === 'linux') ?
+    spawn("mono", [getInklecatePath()].concat(opts)) :
+    spawn(getInklecatePath(), opts);
 
   const compilerOutput = [];
 
