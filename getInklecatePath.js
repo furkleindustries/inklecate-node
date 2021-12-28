@@ -4,7 +4,7 @@ const {
 } = require('path');
 
 module.exports = () => (
-  process.platform === 'darwin' ?
-    join(getBinDir(), 'inklecate') :
-    join(getBinDir(), 'inklecate.exe')
+  process.platform === 'win32' ?
+    join(getBinDir(), 'inklecate.exe') :
+    join(getBinDir(), 'inklecate')
 );
